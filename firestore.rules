@@ -21,7 +21,12 @@ service cloud.firestore {
              data.createdAt == request.time;
     }
 
-    function isAdmin() { return isSignedIn() && request.auth.token.email == 'ibtisam.deeb95@gmail.com'; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        request.auth.token.email == 'ibtisam.deeb95@gmail.com' || 
+        request.auth.token.email == 'ibtisam.gemini@gmail.com'
+      ); 
+    }
 
     match /users/{userId} {
       allow read: if true; // Allow anyone to see profiles to facilitate communication
