@@ -1,0 +1,21 @@
+{
+  "name": "Beso AI Video Studio",
+  "short_name": "Beso AI",
+  "description": "Create AI videos for free.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#9333ea",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=beso&backgroundColor=9333ea",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/shapes/svg?seed=beso&backgroundColor=9333ea",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
