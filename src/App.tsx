@@ -136,8 +136,11 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
 
-  const ADMIN_EMAIL = 'ibtisam.deeb95@gmail.com';
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const ADMIN_EMAILS = ['ibtisam.deeb95@gmail.com', 'ibtisam.gemini@gmail.com'];
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
+  const [adminPassInput, setAdminPassInput] = useState('');
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email || '') && isAdminUnlocked;
+  
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingDisplayName, setIsEditingDisplayName] = useState(false);
   const [newUsername, setNewUsername] = useState('');
@@ -286,14 +289,14 @@ export default function App() {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (user && isAdmin) {
+    if (user && ADMIN_EMAILS.includes(user.email || '')) {
       const qAll = query(collection(db, 'users'));
       const unsubAll = onSnapshot(qAll, (snap) => {
         setAllUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       });
       return () => unsubAll();
     }
-  }, [user, isAdmin]);
+  }, [user]);
 
   useEffect(() => {
     // Global Videos Sync
@@ -510,13 +513,45 @@ export default function App() {
   };
 
   const handleBanUser = async (userId: string, isBanned: boolean) => {
-    if (!isAdmin) return;
+    if (!user || !ADMIN_EMAILS.includes(user.email || '')) return;
     try {
       await updateDoc(doc(db, 'users', userId), {
         banned: isBanned
       });
     } catch (err) {
       setError("Admin action failed.");
+    }
+  };
+
+  const handleDeleteVideo = async (videoId: string) => {
+    if (!user || !ADMIN_EMAILS.includes(user.email || '')) return;
+    if (!window.confirm("حذف هذا الفيديو نهائياً؟")) return;
+    try {
+      await deleteDoc(doc(db, 'videos', videoId));
+      addNotification(user.uid, 'تم الحذف', 'تم حذف الفيديو بنجاح بواسطة المسؤول.', 'info');
+    } catch (err) {
+      setError("Failed to delete video.");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!user || !ADMIN_EMAILS.includes(user.email || '')) return;
+    if (!window.confirm("حذف هذا المستخدم وجميع بياناته؟")) return;
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+      // Optional: Logic to delete all user videos/characters
+    } catch (err) {
+      setError("Failed to delete user.");
+    }
+  };
+
+  const handleAdminAuth = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminPassInput === 'beso200095') {
+      setIsAdminUnlocked(true);
+      setAdminPassInput('');
+    } else {
+      setError("كلمة المرور غير صحيحة");
     }
   };
 
@@ -1218,6 +1253,15 @@ export default function App() {
                       </div>
                       <span className="text-[10px] font-bold text-white drop-shadow-md">Save</span>
                     </div>
+
+                    {((user && ADMIN_EMAILS.includes(user.email || '')) || (user && user.uid === video.userId)) && (
+                      <div className="flex flex-col items-center gap-1 group cursor-pointer" onClick={() => handleDeleteVideo(video.id)}>
+                        <div className="w-11 h-11 bg-red-500/10 backdrop-blur-md rounded-full flex items-center justify-center border border-red-500/20 group-hover:bg-red-500/80 transition-all">
+                          <Trash2 className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-bold text-white drop-shadow-md">Delete</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Info Overlay */}
@@ -1406,57 +1450,95 @@ export default function App() {
           </main>
         ) : currentTab === 'admin' ? (
           <main className="md:col-span-12 glass-card p-4 md:p-8 overflow-hidden flex flex-col h-full bg-black/40 md:rounded-3xl">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center border border-red-500/30">
-                <ShieldCheck className="w-6 h-6 text-red-500" />
+            {!isAdminUnlocked ? (
+              <div className="h-full flex flex-col items-center justify-center max-w-sm mx-auto text-center">
+                <div className="w-20 h-20 bg-purple-500/10 rounded-3xl flex items-center justify-center border border-purple-500/30 mb-6">
+                  <Lock className="w-10 h-10 text-purple-500" />
+                </div>
+                <h2 className="text-2xl font-black mb-2">منطقة محظورة</h2>
+                <p className="text-white/40 text-xs mb-8 uppercase tracking-widest leading-loose">يرجى إدخال كلمة السر الخاصة بالمسؤول للوصول إلى لوحة التحكم</p>
+                <form onSubmit={handleAdminAuth} className="w-full space-y-4">
+                  <input 
+                    type="password" 
+                    value={adminPassInput}
+                    onChange={(e) => setAdminPassInput(e.target.value)}
+                    placeholder="Enter Admin Key..."
+                    className="w-full glass-input px-6 py-4 rounded-2xl text-center font-mono tracking-[1em]"
+                  />
+                  <button type="submit" className="w-full py-4 bg-white text-black font-black rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
+                    UNLOCK DASHBOARD
+                  </button>
+                </form>
               </div>
-              <div>
-                <h2 className="text-xl font-black">ADMIN MODERATION / لوحة الإشراف</h2>
-                <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">Platform safety and user enforcement</p>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allUsers.map((u) => (
-                  <div key={u.id} className="glass-card p-5 flex flex-col gap-5 border-white/5 relative group bg-white/[0.02]">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-white/10 overflow-hidden shrink-0">
-                        {u.photoURL ? <img src={u.photoURL} className="w-full h-full object-cover" /> : <UserIcon className="w-6 h-6 text-white/20" />}
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <h4 className="font-bold text-sm truncate">{u.displayName || 'Anonymous'}</h4>
-                        <p className="text-[10px] text-white/40 truncate font-mono">@{u.username || 'user'}</p>
-                        <p className="text-[9px] text-purple-400 truncate mt-1">{u.email}</p>
-                      </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center border border-red-500/30">
+                      <ShieldCheck className="w-6 h-6 text-red-500" />
                     </div>
-                    
-                    <div className="flex items-center gap-2 mt-auto">
-                      {u.banned ? (
-                        <button 
-                          onClick={() => handleBanUser(u.id, false)}
-                          className="flex-1 py-3 bg-green-500/20 border border-green-500/40 text-green-400 text-[9px] font-black rounded-xl hover:bg-green-500/30 transition-all uppercase tracking-widest"
-                        >
-                          UNBAN / رفع الحظر
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => handleBanUser(u.id, true)}
-                          className="flex-1 py-3 bg-red-500/20 border border-red-500/40 text-red-400 text-[9px] font-black rounded-xl hover:bg-red-500/30 transition-all uppercase tracking-widest"
-                        >
-                          BAN USER / حظر المستخدم
-                        </button>
-                      )}
-                      {u.email === ADMIN_EMAIL && (
-                        <div className="absolute top-4 right-4 bg-purple-500/20 text-purple-400 text-[8px] font-bold px-2 py-1 rounded-md border border-purple-500/30 uppercase">
-                          Root Admin
-                        </div>
-                      )}
+                    <div>
+                      <h2 className="text-xl font-black">ADMIN MODERATION / لوحة الإشراف</h2>
+                      <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">Platform safety and user enforcement</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <button 
+                    onClick={() => setIsAdminUnlocked(false)} 
+                    className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold hover:bg-red-500/20 hover:text-red-400 transition-all"
+                  >
+                    LOCK / إغلاق
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {allUsers.map((u) => (
+                      <div key={u.id} className="glass-card p-5 flex flex-col gap-5 border-white/5 relative group bg-white/[0.02]">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-white/10 overflow-hidden shrink-0">
+                            {u.photoURL ? <img src={u.photoURL} className="w-full h-full object-cover" /> : <UserIcon className="w-6 h-6 text-white/20" />}
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <h4 className="font-bold text-sm truncate">{u.displayName || 'Anonymous'}</h4>
+                            <p className="text-[10px] text-white/40 truncate font-mono">@{u.username || 'user'}</p>
+                            <p className="text-[9px] text-purple-400 truncate mt-1">{u.email}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 mt-auto">
+                          {u.banned ? (
+                            <button 
+                              onClick={() => handleBanUser(u.id, false)}
+                              className="py-3 bg-green-500/20 border border-green-500/40 text-green-400 text-[9px] font-black rounded-xl hover:bg-green-500/30 transition-all uppercase tracking-widest"
+                            >
+                              UNBAN
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => handleBanUser(u.id, true)}
+                              className="py-3 bg-red-500/20 border border-red-500/40 text-red-400 text-[9px] font-black rounded-xl hover:bg-red-500/30 transition-all uppercase tracking-widest"
+                            >
+                              BAN
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteUser(u.id)}
+                            className="py-3 bg-white/5 border border-white/10 text-white/40 text-[9px] font-black rounded-xl hover:bg-red-900/40 hover:text-white transition-all uppercase tracking-widest"
+                          >
+                            DELETE
+                          </button>
+                        </div>
+                        {ADMIN_EMAILS.includes(u.email || '') && (
+                          <div className="absolute top-4 right-4 bg-purple-500/20 text-purple-400 text-[8px] font-bold px-2 py-1 rounded-md border border-purple-500/30 uppercase">
+                            Root Admin
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </main>
         ) : currentTab === 'inbox' ? (
           <main className="md:col-span-12 glass-card p-4 md:p-8 overflow-hidden flex flex-col h-full bg-black/40 md:rounded-3xl">
