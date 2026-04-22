@@ -1,6 +1,13 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { getFirestore, serverTimestamp, collection, addDoc, query, where, getDocs, doc, getDocFromServer } from 'firebase/firestore';
+import { 
+  getAuth, GoogleAuthProvider, signInWithPopup, 
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, updateProfile
+} from 'firebase/auth';
+import { 
+  getFirestore, serverTimestamp, collection, addDoc, query, 
+  where, getDocs, doc, getDocFromServer, setDoc 
+} from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
@@ -9,6 +16,14 @@ export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+
+export { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  setDoc
+};
 
 export async function testConnection() {
   try {
