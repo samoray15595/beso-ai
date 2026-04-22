@@ -1,0 +1,63 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account information and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Video": {
+      "title": "Generated Video",
+      "description": "Information about generated or drafted videos.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "prompt": { "type": "string" },
+        "refinedPrompt": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "duration": { "type": "number" },
+        "style": { "type": "string" },
+        "mood": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "prompt", "videoUrl"]
+    },
+    "Character": {
+      "title": "AI Character",
+      "description": "User created character profiles for video generation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "voiceId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "imageUrl", "voiceId"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles."
+    },
+    "videos/{videoId}": {
+      "schema": "Video",
+      "description": "Global collection of all generated videos."
+    },
+    "characters/{characterId}": {
+      "schema": "Character",
+      "description": "User created characters for referencing in prompts."
+    }
+  }
+}
