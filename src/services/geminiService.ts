@@ -9,6 +9,7 @@ export interface VideoOptions {
   elements?: string;
   characterRef?: string;
   characterVoice?: string;
+  imageReference?: string; // Optional image context
 }
 
 export interface VideoGenerationResult {
@@ -46,9 +47,8 @@ export const geminiService = {
   /**
    * Initiates video generation using the Veo model.
    */
-  async generateVideo(prompt: string, duration: number): Promise<any> {
-    // Note: The Veo model might have its own limits, but we follow the user requirement for duration selection
-    const operation = await ai.models.generateVideos({
+  async generateVideo(prompt: string, duration: number, imageBase64?: string): Promise<any> {
+    const config: any = {
       model: 'veo-3.1-lite-generate-preview',
       prompt: prompt,
       config: {
@@ -56,7 +56,16 @@ export const geminiService = {
         resolution: '1080p',
         aspectRatio: '16:9'
       }
-    });
+    };
+
+    if (imageBase64) {
+      // If image is provided, we use the image-to-video capability
+      config.image = {
+        imageBytes: imageBase64.split(',')[1] // Strip prefix
+      };
+    }
+
+    const operation = await ai.models.generateVideos(config);
     return operation;
   },
 
