@@ -8,8 +8,27 @@
 
 @layer base {
   body {
-    @apply bg-[#0f172a] text-white antialiased overflow-hidden;
+    @apply bg-[#0f172a] text-white antialiased overflow-hidden fixed inset-0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
+}
+
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-bottom {
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .frosted-bg {

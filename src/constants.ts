@@ -38,17 +38,17 @@ export const MOODS = [
 
 export const VOICES = [
   // Arabic - Male - Child
-  { id: 'ar-m-y-1', label: 'زيد (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male' },
-  { id: 'ar-m-y-2', label: 'عمر (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male' },
-  { id: 'ar-m-y-3', label: 'ياسين (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male' },
-  { id: 'ar-m-y-4', label: 'جاد (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male' },
-  { id: 'ar-m-y-5', label: 'ريان (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male' },
+  { id: 'ar-m-y-1', label: 'زيد (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male', previewUrl: 'https://www.soundjay.com/buttons/button-1.mp3' },
+  { id: 'ar-m-y-2', label: 'عمر (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male', previewUrl: 'https://www.soundjay.com/buttons/button-2.mp3' },
+  { id: 'ar-m-y-3', label: 'ياسين (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male', previewUrl: 'https://www.soundjay.com/buttons/button-3.mp3' },
+  { id: 'ar-m-y-4', label: 'جاد (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male', previewUrl: 'https://www.soundjay.com/buttons/button-4.mp3' },
+  { id: 'ar-m-y-5', label: 'ريان (طفل عربي)', category: 'Arabic', age: 'Child', gender: 'Male', previewUrl: 'https://www.soundjay.com/buttons/button-5.mp3' },
   // Arabic - Female - Child
-  { id: 'ar-f-y-1', label: 'ليان (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female' },
-  { id: 'ar-f-y-2', label: 'سارة (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female' },
-  { id: 'ar-f-y-3', label: 'ديما (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female' },
-  { id: 'ar-f-y-4', label: 'نور (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female' },
-  { id: 'ar-f-y-5', label: 'حلا (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female' },
+  { id: 'ar-f-y-1', label: 'ليان (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female', previewUrl: 'https://www.soundjay.com/buttons/button-6.mp3' },
+  { id: 'ar-f-y-2', label: 'سارة (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female', previewUrl: 'https://www.soundjay.com/buttons/button-7.mp3' },
+  { id: 'ar-f-y-3', label: 'ديما (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female', previewUrl: 'https://www.soundjay.com/buttons/button-8.mp3' },
+  { id: 'ar-f-y-4', label: 'نور (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female', previewUrl: 'https://www.soundjay.com/buttons/button-9.mp3' },
+  { id: 'ar-f-y-5', label: 'حلا (طفلة عربية)', category: 'Arabic', age: 'Child', gender: 'Female', previewUrl: 'https://www.soundjay.com/buttons/button-10.mp3' },
   // Arabic - Male - Adult
   { id: 'ar-m-a-1', label: 'أحمد (رجل عربي - عميق)', category: 'Arabic', age: 'Adult', gender: 'Male' },
   { id: 'ar-m-a-2', label: 'كريم (رجل عربي - هادئ)', category: 'Arabic', age: 'Adult', gender: 'Male' },
