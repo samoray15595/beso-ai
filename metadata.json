@@ -1,6 +1,6 @@
 {
   "name": "Beso AI Video Studio",
   "description": "A completely free, unlimited AI video generation platform. Create cinematic stories, custom characters, and high-fidelity visuals with advanced control over duration, style, and mood.",
-  "requestFramePermissions": ["camera"],
+  "requestFramePermissions": [],
   "majorCapabilities": ["AI Video Generation", "Character Creation", "Personal Profiles", "Unlimited Generation"]
 }

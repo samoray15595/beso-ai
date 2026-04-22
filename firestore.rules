@@ -12,20 +12,31 @@ service cloud.firestore {
     function existing() { return resource.data; }
 
     function isValidUser(data) {
-      return data.keys().hasAll(['uid', 'email', 'createdAt']) &&
-             data.keys().size() <= 6 &&
+      return data.keys().hasAll(['uid', 'email', 'username', 'createdAt']) &&
+             data.keys().size() <= 7 &&
              data.uid == request.auth.uid &&
+             data.username is string && data.username.size() <= 50 &&
              data.email is string &&
              data.email.size() <= 256 &&
              data.createdAt == request.time;
     }
 
+    function isAdmin() { return isSignedIn() && request.auth.token.email == 'ibtisam.deeb95@gmail.com'; }
+
     match /users/{userId} {
-      allow get: if isSignedIn();
+      allow read: if true; // Allow anyone to see profiles to facilitate communication
       allow create: if isOwner(userId) && isValidUser(incoming());
-      allow update: if isOwner(userId) && 
-                      incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']) &&
-                      incoming().uid == userId;
+      allow update: if (isOwner(userId) && 
+                      incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'username', 'bio']) &&
+                      incoming().uid == userId) || isAdmin();
+    }
+
+    match /chats/{chatId} {
+      allow read, write: if isSignedIn(); // Open communication for all signed-in users
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if isSignedIn(); // Simplifed for maximum interaction
     }
 
     function isValidVideo(data) {
@@ -39,17 +50,10 @@ service cloud.firestore {
     }
 
     match /videos/{videoId} {
-      allow get: if isSignedIn() && (existing().status == 'published' || isOwner(existing().userId));
-      allow list: if isSignedIn() && (resource.data.status == 'published' || isOwner(resource.data.userId));
+      allow read: if true; // Open visibility for all
       allow create: if isSignedIn() && isValidVideo(incoming()) && isValidId(videoId);
-      allow update: if isOwner(existing().userId) && 
-                      isValidVideo(incoming()) &&
-                      incoming().userId == existing().userId &&
-                      (
-                        (incoming().diff(existing()).affectedKeys().hasOnly(['status'])) ||
-                        (incoming().diff(existing()).affectedKeys().hasOnly(['prompt', 'status']))
-                      );
-      allow delete: if isOwner(existing().userId);
+      allow update: if isOwner(existing().userId) || isAdmin();
+      allow delete: if isOwner(existing().userId) || isAdmin();
     }
 
     function isValidCharacter(data) {
@@ -64,6 +68,21 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.userId);
       allow create: if isSignedIn() && isValidCharacter(incoming()) && isValidId(characterId);
       allow delete: if isOwner(existing().userId);
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn() && 
+                     incoming().userId == request.auth.uid && 
+                     incoming().text is string && incoming().text.size() <= 1000;
+      allow delete: if isSignedIn() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && 
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
     }
   }
 }

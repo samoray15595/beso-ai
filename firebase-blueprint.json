@@ -7,11 +7,12 @@
       "properties": {
         "uid": { "type": "string" },
         "displayName": { "type": "string" },
+        "username": { "type": "string" },
         "email": { "type": "string" },
         "photoURL": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["uid", "email"]
+      "required": ["uid", "email", "username"]
     },
     "Video": {
       "title": "Generated Video",
@@ -44,6 +45,45 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "imageUrl", "voiceId"]
+    },
+    "Comment": {
+      "title": "Video Comment",
+      "description": "User comments on videos.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "videoId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPic": { "type": "string" },
+        "text": { "type": "string" },
+        "replyToId": { "type": "string" },
+        "replyToName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["videoId", "userId", "text"]
+    },
+    "Chat": {
+      "title": "Chat Session",
+      "description": "A conversation between multiple users.",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Message": {
+      "title": "Chat Message",
+      "description": "A single message within a chat session.",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "senderId", "text"]
     }
   },
   "firestore": {
@@ -58,6 +98,22 @@
     "characters/{characterId}": {
       "schema": "Character",
       "description": "User created characters for referencing in prompts."
+    },
+    "comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Comments left on videos."
+    },
+    "chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Active chat conversations."
+    },
+    "messages/{messageId}": {
+      "schema": "Message",
+      "description": "Chronological messages within chats."
+    },
+    "notifications/{notifId}": {
+      "schema": "object",
+      "description": "User specific notifications."
     }
   }
 }
